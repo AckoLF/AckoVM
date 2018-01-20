@@ -2,14 +2,17 @@
 
 System::System(PhysicalAddress processVMSpace, PageNum processVMSpaceSize,
                PhysicalAddress pmtSpace, PageNum pmtSpaceSize,
-               Partition* partition) {}
+               Partition* partition) {
+  this->pSystem = new KernelSystem(processVMSpace, processVMSpaceSize, pmtSpace,
+                                   pmtSpaceSize, partition);
+}
 
-System::~System() {}
+System::~System() { delete pSystem; }
 
-Process* System::createProcess() { return nullptr; }
+Process* System::createProcess() { return this->pSystem->createProcess(); }
 
-Time System::periodicJob() { return Time(); }
+Time System::periodicJob() { return this->pSystem->periodicJob(); }
 
 Status System::access(ProcessId pid, VirtualAddress address, AccessType type) {
-  return Status();
+  return this->pSystem->access(pid, address, type);
 }

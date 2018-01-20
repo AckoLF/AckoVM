@@ -1,5 +1,6 @@
 #pragma once
 
+#include "KernelSystem.h"
 #include "vm_declarations.h"
 
 class Partition;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "KernelProcess.h"
 #include "vm_declarations.h"
 
 class KernelProcess;
