@@ -113,6 +113,16 @@
   <ItemGroup>
     <ClCompile Include="AckoVM.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="disk1.dat" />
+    <None Include="p1.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="part.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="part.lib" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -19,4 +19,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="disk1.dat" />
+    <None Include="p1.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="part.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="part.lib" />
+  </ItemGroup>
 </Project>
