@@ -24,6 +24,7 @@ class KernelSystem {
   Time periodicJob();
   Status access(ProcessId pid, VirtualAddress address, AccessType type);
 
+  static KernelSystem* getInstance();
   static KernelSystem* getInstance(PhysicalAddress processVMSpace,
                                    PageNum processVMSpaceSize,
                                    PhysicalAddress pmtSpace,

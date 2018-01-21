@@ -1,5 +1,7 @@
 #include "KernelSystem.h"
 
+#include <cassert>
+
 KernelSystem* KernelSystem::instance = nullptr;
 
 KernelSystem::KernelSystem(PhysicalAddress processVMSpace,
@@ -25,6 +27,11 @@ Time KernelSystem::periodicJob() { return PERIODIC_JOB_TIME; }
 Status KernelSystem::access(ProcessId pid, VirtualAddress address,
                             AccessType type) {
   return Status();
+}
+
+KernelSystem* KernelSystem::getInstance() {
+  assert(instance != nullptr);
+  return instance;
 }
 
 KernelSystem* KernelSystem::getInstance(PhysicalAddress processVMSpace,
