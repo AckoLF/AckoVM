@@ -48,8 +48,15 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
               << std::endl;
     return Status::TRAP;
   }
-  // and then load it with content
-  // TODO (acko): Load the segment with content
+  // Afterwards load the segment with content
+  for (int i = 0; i < segmentSize; i++) {
+    auto offset = i * PAGE_SIZE;
+    VirtualAddress currentAddress = startAddress + offset;
+    auto currentContent = reinterpret_cast<PhysicalAddress>(
+        reinterpret_cast<uint64_t>(content) + offset);
+    auto physicalAddress = virtualAddressToPhysicalAddress[currentAddress];
+    memcpy(physicalAddress, currentContent, PAGE_SIZE);
+  }
   return Status::OK;
 }
 
