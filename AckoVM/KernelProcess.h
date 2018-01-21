@@ -20,7 +20,6 @@ class KernelProcess {
 
  private:
   ProcessId pid;
-  std::unordered_map<VirtualAddress, PhysicalAddress>
-      virtualAddressToPhysicalAddress;
+  std::unordered_map<VirtualAddress, PhysicalAddress> pmt;
   std::unordered_map<VirtualAddress, AccessType> segmentAccessPermissions;
 };

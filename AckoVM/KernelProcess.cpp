@@ -24,8 +24,8 @@ Status KernelProcess::createSegment(VirtualAddress startAddress,
   bool overlapFound = false;
   for (int i = 0; i < segmentSize && !overlapFound; i++) {
     VirtualAddress currentAddress = startAddress + i * PAGE_SIZE;
-    auto it = virtualAddressToPhysicalAddress.find(currentAddress);
-    if (it != virtualAddressToPhysicalAddress.end()) {
+    auto it = pmt.find(currentAddress);
+    if (it != pmt.end()) {
       overlapFound = true;
     }
   }
@@ -45,7 +45,7 @@ Status KernelProcess::createSegment(VirtualAddress startAddress,
     VirtualAddress currentAddress = startAddress + i * PAGE_SIZE;
     auto segmentPhysicalAddress = freeSegments->front();
     freeSegments->pop_front();
-    virtualAddressToPhysicalAddress[currentAddress] = segmentPhysicalAddress;
+    pmt[currentAddress] = segmentPhysicalAddress;
     segmentAccessPermissions[currentAddress] = flags;
   }
   return Status::OK;
@@ -73,7 +73,7 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
     VirtualAddress currentAddress = startAddress + offset;
     auto currentContent = reinterpret_cast<PhysicalAddress>(
         reinterpret_cast<uint64_t>(content) + offset);
-    auto physicalAddress = virtualAddressToPhysicalAddress[currentAddress];
+    auto physicalAddress = pmt[currentAddress];
     memcpy(physicalAddress, currentContent, PAGE_SIZE);
   }
 
@@ -81,15 +81,15 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
 }
 
 Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
-  auto it = virtualAddressToPhysicalAddress.find(startAddress);
-  if (it == virtualAddressToPhysicalAddress.end()) {
+  auto it = pmt.find(startAddress);
+  if (it == pmt.end()) {
     std::cout << "KernelProcess::deleteSegment() startAddress: " << startAddress
               << " does not belong to any segment, refusing to deleteSegment"
               << std::endl;
     return Status::TRAP;
   }
   auto physicalAddress = it->second;
-  virtualAddressToPhysicalAddress.erase(startAddress);
+  pmt.erase(startAddress);
   segmentAccessPermissions.erase(startAddress);
   return Status::OK;
 }
@@ -105,8 +105,8 @@ Status KernelProcess::pageFault(VirtualAddress address) {
 PhysicalAddress KernelProcess::getPhysicalAddress(VirtualAddress address) {
   VirtualAddress offset = address % PAGE_SIZE;
   VirtualAddress alignedVirtualAddress = address - offset;
-  auto& it = virtualAddressToPhysicalAddress.find(alignedVirtualAddress);
-  if (it != virtualAddressToPhysicalAddress.end()) {
+  auto& it = pmt.find(alignedVirtualAddress);
+  if (it != pmt.end()) {
     auto physicalAddress = reinterpret_cast<uint64_t>(it->second);
     return reinterpret_cast<PhysicalAddress>(physicalAddress + offset);
   }
