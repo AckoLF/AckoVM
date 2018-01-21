@@ -1,6 +1,7 @@
 #include "KernelSystem.h"
 
 #include <cassert>
+#include <iostream>
 
 KernelSystem* KernelSystem::instance = nullptr;
 
@@ -8,6 +9,12 @@ KernelSystem::KernelSystem(PhysicalAddress processVMSpace,
                            PageNum processVMSpaceSize, PhysicalAddress pmtSpace,
                            PageNum pmtSpaceSize, Partition* partition) {
   this->lastGeneratedPID = 0;
+  auto startAddress = reinterpret_cast<uint64_t>(processVMSpace);
+  for (int i = 0; i < processVMSpaceSize; i++) {
+    auto currentAddress = startAddress + i * PAGE_SIZE;
+    this->freeSegments.emplace_back(
+        reinterpret_cast<PhysicalAddress>(currentAddress));
+  }
 }
 
 KernelSystem::~KernelSystem() {
@@ -18,14 +25,30 @@ KernelSystem::~KernelSystem() {
 }
 
 Process* KernelSystem::createProcess() {
-  ProcessId cuurrentPID = ++lastGeneratedPID;
-  return new Process(cuurrentPID);
+  ProcessId currentPID = ++lastGeneratedPID;
+  auto process = new Process(currentPID);
+  activeProcesses[currentPID] = process;
+  return process;
 }
 
 Time KernelSystem::periodicJob() { return PERIODIC_JOB_TIME; }
 
 Status KernelSystem::access(ProcessId pid, VirtualAddress address,
                             AccessType type) {
+  auto it = activeProcesses.find(pid);
+  if (it == activeProcesses.end()) {
+    std::cout << "KernelSystem::access() pid: " << pid << " is not active"
+              << std::endl;
+    return Status::TRAP;
+  }
+  auto process = it->second;
+  auto physicalAddress = process->getPhysicalAddress(address);
+  if (physicalAddress == 0) {
+    std::cout << "KernelSystem::access() virtualAddress: " << address
+              << " does not belong to pid: " << pid << std::endl;
+    return Status::TRAP;
+  }
+  // TOOD(acko): Check for proper flags here
   return Status::OK;
 }
 

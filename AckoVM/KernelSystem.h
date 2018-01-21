@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <unordered_map>
 
 #include "part.h"
@@ -29,6 +30,7 @@ class KernelSystem {
                                    PageNum processVMSpaceSize,
                                    PhysicalAddress pmtSpace,
                                    PageNum pmtSpaceSize, Partition* partition);
+  std::list<PhysicalAddress> freeSegments;
 
  private:
   ProcessId lastGeneratedPID;
