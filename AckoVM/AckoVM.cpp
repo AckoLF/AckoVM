@@ -37,8 +37,26 @@ int main(void) {
   PhysicalAddress alignedPmtSpace = alignPointer(pmtSpace);
   cout << "alignedPmtSpace: " << alignedPmtSpace << endl;
 
-  System system(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
-                partition);
+  cout << "Testing whether KernelSystem is singleton or not" << endl;
+
+  System system1(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
+                 partition);
+  System system2(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
+                 partition);
+  System system3(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
+                 partition);
+
+  auto process1 = system1.createProcess();
+  auto process2 = system2.createProcess();
+  auto process3 = system3.createProcess();
+
+  cout << "proccess1 pid: " << process1->getProcessId() << endl;
+  cout << "proccess2 pid: " << process2->getProcessId() << endl;
+  cout << "proccess3 pid: " << process3->getProcessId() << endl;
+
+  int debug;
+  cin >> debug;
+  cout << debug << endl;
 
   return 0;
 }

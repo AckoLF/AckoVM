@@ -3,11 +3,11 @@
 System::System(PhysicalAddress processVMSpace, PageNum processVMSpaceSize,
                PhysicalAddress pmtSpace, PageNum pmtSpaceSize,
                Partition* partition) {
-  this->pSystem = new KernelSystem(processVMSpace, processVMSpaceSize, pmtSpace,
-                                   pmtSpaceSize, partition);
+  this->pSystem = KernelSystem::getInstance(processVMSpace, processVMSpaceSize,
+                                            pmtSpace, pmtSpaceSize, partition);
 }
 
-System::~System() { delete pSystem; }
+System::~System() {}
 
 Process* System::createProcess() { return this->pSystem->createProcess(); }
 
