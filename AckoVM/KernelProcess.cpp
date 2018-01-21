@@ -1,5 +1,7 @@
 #include "KernelProcess.h"
 
+#include <iostream>
+
 KernelProcess::KernelProcess(ProcessId pid) { this->pid = pid; }
 
 KernelProcess::~KernelProcess() {}
@@ -8,17 +10,27 @@ ProcessId KernelProcess::getProcessId() const { return pid; }
 
 Status KernelProcess::createSegment(VirtualAddress startAddress,
                                     PageNum segmentSize, AccessType flags) {
-  return Status();
+  if (startAddress % PAGE_SIZE) {
+    std::cout << "KernelProcess::createSegment startAddress: " << startAddress
+              << " is not aligned to PAGE_SIZE: " << PAGE_SIZE << std::endl;
+    return Status::TRAP;
+  }
+  return Status::OK;
 }
 
 Status KernelProcess::loadSegment(VirtualAddress startAddress,
                                   PageNum segmentSize, AccessType flags,
                                   void* content) {
-  return Status();
+  if (startAddress % PAGE_SIZE) {
+    std::cout << "KernelProcess::loadSegment startAddress: " << startAddress
+              << " is not aligned to PAGE_SIZE: " << PAGE_SIZE << std::endl;
+    return Status::TRAP;
+  }
+  return Status::OK;
 }
 
 Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
-  return Status();
+  return Status::OK;
 }
 
 Status KernelProcess::pageFault(VirtualAddress address) { return Status(); }

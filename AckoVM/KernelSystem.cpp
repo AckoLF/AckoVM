@@ -26,7 +26,7 @@ Time KernelSystem::periodicJob() { return PERIODIC_JOB_TIME; }
 
 Status KernelSystem::access(ProcessId pid, VirtualAddress address,
                             AccessType type) {
-  return Status();
+  return Status::OK;
 }
 
 KernelSystem* KernelSystem::getInstance() {
