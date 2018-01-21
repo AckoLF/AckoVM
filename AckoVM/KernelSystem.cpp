@@ -86,4 +86,6 @@ PhysicalAddress KernelSystem::getFreeSegment() {
   return freeSegment;
 }
 
-void KernelSystem::releaseSegment(PhysicalAddress segment) {}
+void KernelSystem::releaseSegment(PhysicalAddress segment) {
+  freeSegments.emplace_back(segment);
+}
