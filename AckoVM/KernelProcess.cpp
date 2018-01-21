@@ -40,7 +40,7 @@ Status KernelProcess::createSegment(VirtualAddress startAddress,
 
   auto kernelSystem = KernelSystem::getInstance();
   auto freeSegments = &kernelSystem->freeSegments;
-  std::cout << "freeSegments: " << freeSegments->size() << std::endl;
+  std::cout << "freeSegments size: " << freeSegments->size() << std::endl;
   for (int i = 0; i < segmentSize; i++) {
     VirtualAddress currentAddress = startAddress + i * PAGE_SIZE;
     auto segmentPhysicalAddress = freeSegments->front();
@@ -81,6 +81,16 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
 }
 
 Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
+  auto it = virtualAddressToPhysicalAddress.find(startAddress);
+  if (it != virtualAddressToPhysicalAddress.end()) {
+    std::cout << "KernelProcess::deleteSegment() startAddress: " << startAddress
+              << " does not belong to any segment, refusing to deleteSegment"
+              << std::endl;
+    return Status::TRAP;
+  }
+  auto physicalAddress = it->second;
+  virtualAddressToPhysicalAddress.erase(startAddress);
+  segmentAccessPermissions.erase(startAddress);
   return Status::OK;
 }
 
