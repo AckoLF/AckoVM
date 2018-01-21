@@ -48,7 +48,18 @@ Status KernelSystem::access(ProcessId pid, VirtualAddress address,
               << " does not belong to pid: " << pid << std::endl;
     return Status::TRAP;
   }
-  // TOOD(acko): Check for proper flags here
+  auto alignedAddress = address - address % PAGE_SIZE;
+  auto segmentAccessPermissions =
+      process->getSegmentAccessPermissions(alignedAddress);
+  if (segmentAccessPermissions == AccessType::READ_WRITE) {
+    if (type != AccessType::READ && type != AccessType::WRITE) {
+      return Status::TRAP;
+    }
+    return Status::OK;
+  }
+  if (segmentAccessPermissions != type) {
+    return Status::TRAP;
+  }
   return Status::OK;
 }
 

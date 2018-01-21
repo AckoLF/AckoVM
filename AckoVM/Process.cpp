@@ -27,3 +27,7 @@ Status Process::pageFault(VirtualAddress address) {
 PhysicalAddress Process::getPhysicalAddress(VirtualAddress address) {
   return this->pProcess->getPhysicalAddress(address);
 }
+
+AccessType Process::getSegmentAccessPermissions(VirtualAddress address) {
+  return pProcess->getSegmentAccessPermissions(address);
+}

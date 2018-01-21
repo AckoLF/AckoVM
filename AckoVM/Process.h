@@ -19,6 +19,7 @@ class Process {
   Status deleteSegment(VirtualAddress startAddress);
   Status pageFault(VirtualAddress address);
   PhysicalAddress getPhysicalAddress(VirtualAddress address);
+  AccessType getSegmentAccessPermissions(VirtualAddress address);
 
  private:
   KernelProcess *pProcess;

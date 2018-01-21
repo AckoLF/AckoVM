@@ -66,7 +66,10 @@ PhysicalAddress KernelProcess::getPhysicalAddress(VirtualAddress address) {
   if (it != virtualAddressToPhysicalAddress.end()) {
     auto physicalAddress = reinterpret_cast<uint64_t>(it->second);
     return reinterpret_cast<PhysicalAddress>(physicalAddress + offset);
-  } else {
-    return 0;
   }
+  return 0;
+}
+
+AccessType KernelProcess::getSegmentAccessPermissions(VirtualAddress address) {
+  return segmentAccessPermissions[address];
 }

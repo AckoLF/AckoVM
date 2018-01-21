@@ -16,6 +16,7 @@ class KernelProcess {
   Status deleteSegment(VirtualAddress startAddress);
   Status pageFault(VirtualAddress address);
   PhysicalAddress getPhysicalAddress(VirtualAddress address);
+  AccessType getSegmentAccessPermissions(VirtualAddress address);
 
  private:
   ProcessId pid;
