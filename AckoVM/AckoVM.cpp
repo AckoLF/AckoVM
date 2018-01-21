@@ -3,6 +3,8 @@
 #include "part.h"
 #include "vm_declarations.h"
 
+#include "System.h"
+
 #define VM_SPACE_SIZE (10000)
 #define PMT_SPACE_SIZE (3000)
 
@@ -18,10 +20,8 @@ PhysicalAddress alignPointer(PhysicalAddress address) {
 }
 
 int main(void) {
-  cout << "Hello, World!" << endl;
-
-  auto p1 = new Partition("p1.ini");
-  cout << p1->getNumOfClusters() << endl;
+  auto partition = new Partition("p1.ini");
+  cout << partition->getNumOfClusters() << endl;
 
   uint64_t size = (VM_SPACE_SIZE + 2) * PAGE_SIZE;
   PhysicalAddress vmSpace = (PhysicalAddress) new char[size];
@@ -36,6 +36,9 @@ int main(void) {
   cout << "pmtSpace: " << pmtSpace << endl;
   PhysicalAddress alignedPmtSpace = alignPointer(pmtSpace);
   cout << "alignedPmtSpace: " << alignedPmtSpace << endl;
+
+  System system(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
+                partition);
 
   return 0;
 }

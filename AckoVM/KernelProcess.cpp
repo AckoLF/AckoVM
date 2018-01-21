@@ -24,5 +24,13 @@ Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
 Status KernelProcess::pageFault(VirtualAddress address) { return Status(); }
 
 PhysicalAddress KernelProcess::getPhysicalAddress(VirtualAddress address) {
-  return PhysicalAddress();
+  VirtualAddress offset = address % PAGE_SIZE;
+  VirtualAddress alignedVirtualAddress = address - offset;
+  auto& it = virtualAddressToPhysicalAddress.find(alignedVirtualAddress);
+  if (it != virtualAddressToPhysicalAddress.end()) {
+    auto physicalAddress = reinterpret_cast<uint64_t>(it->second);
+    return reinterpret_cast<PhysicalAddress>(physicalAddress + offset);
+  } else {
+    return nullptr;
+  }
 }

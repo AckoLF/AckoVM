@@ -2,6 +2,8 @@
 
 #include "vm_declarations.h"
 
+#include <unordered_map>
+
 class KernelProcess {
  public:
   KernelProcess(ProcessId pid);
@@ -17,4 +19,6 @@ class KernelProcess {
 
  private:
   ProcessId pid;
+  std::unordered_map<VirtualAddress, PhysicalAddress>
+      virtualAddressToPhysicalAddress;
 };

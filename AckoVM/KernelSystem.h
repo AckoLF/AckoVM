@@ -1,9 +1,13 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "part.h"
 #include "vm_declarations.h"
 
 #include "Process.h"
+
+#define PERIODIC_JOB_TIME (150)
 
 class KernelSystem {
  public:
@@ -16,4 +20,8 @@ class KernelSystem {
   Time periodicJob();
   // Hardware job
   Status access(ProcessId pid, VirtualAddress address, AccessType type);
+
+ private:
+  ProcessId lastGeneratedPID;
+  std::unordered_map<ProcessId, Process*> activeProcesses;
 };
