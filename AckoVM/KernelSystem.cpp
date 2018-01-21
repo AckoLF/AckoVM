@@ -79,3 +79,11 @@ KernelSystem* KernelSystem::getInstance(PhysicalAddress processVMSpace,
   }
   return instance;
 }
+
+PhysicalAddress KernelSystem::getFreeSegment() {
+  auto freeSegment = freeSegments.front();
+  freeSegments.pop_front();
+  return freeSegment;
+}
+
+void KernelSystem::releaseSegment(PhysicalAddress segment) {}

@@ -30,10 +30,13 @@ class KernelSystem {
                                    PageNum processVMSpaceSize,
                                    PhysicalAddress pmtSpace,
                                    PageNum pmtSpaceSize, Partition* partition);
-  std::list<PhysicalAddress> freeSegments;
+
+  PhysicalAddress getFreeSegment();
+  void releaseSegment(PhysicalAddress segment);
 
  private:
   ProcessId lastGeneratedPID;
+  std::list<PhysicalAddress> freeSegments;
   std::unordered_map<ProcessId, Process*> activeProcesses;
   KernelSystem(PhysicalAddress processVMSpace, PageNum processVMSpaceSize,
                PhysicalAddress pmtSpace, PageNum pmtSpaceSize,
