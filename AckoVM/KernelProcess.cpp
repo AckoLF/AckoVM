@@ -82,7 +82,7 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
 
 Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
   auto it = virtualAddressToPhysicalAddress.find(startAddress);
-  if (it != virtualAddressToPhysicalAddress.end()) {
+  if (it == virtualAddressToPhysicalAddress.end()) {
     std::cout << "KernelProcess::deleteSegment() startAddress: " << startAddress
               << " does not belong to any segment, refusing to deleteSegment"
               << std::endl;
@@ -94,7 +94,13 @@ Status KernelProcess::deleteSegment(VirtualAddress startAddress) {
   return Status::OK;
 }
 
-Status KernelProcess::pageFault(VirtualAddress address) { return Status(); }
+Status KernelProcess::pageFault(VirtualAddress address) {
+  // TODO (acko): Implement pageFault, need to track which segments are stored
+  // on the partition and generate pageFault when trying to access them. This
+  // function should load the segment from the partition and put some other
+  // segment on the partition.
+  return Status::OK;
+}
 
 PhysicalAddress KernelProcess::getPhysicalAddress(VirtualAddress address) {
   VirtualAddress offset = address % PAGE_SIZE;

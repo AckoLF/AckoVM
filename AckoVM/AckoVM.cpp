@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 
 #include "part.h"
@@ -41,39 +42,6 @@ int main(void) {
   PhysicalAddress alignedPmtSpace = alignPointer(pmtSpace);
   cout << "alignedPmtSpace: " << alignedPmtSpace << endl;
 
-  // cout << "Testing whether KernelSystem is singleton or not" << endl;
-
-  // System system1(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace,
-  // PMT_SPACE_SIZE,
-  //               partition);
-  // System system2(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace,
-  // PMT_SPACE_SIZE,
-  //               partition);
-  // System system3(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace,
-  // PMT_SPACE_SIZE,
-  //               partition);
-
-  // auto process1 = system1.createProcess();
-  // auto process2 = system2.createProcess();
-  // auto process3 = system3.createProcess();
-
-  // cout << "proccess1 pid: " << process1->getProcessId() << endl;
-  // cout << "proccess2 pid: " << process2->getProcessId() << endl;
-  // cout << "proccess3 pid: " << process3->getProcessId() << endl;
-
-  // auto virtualAddress = reinterpret_cast<uint64_t>(alignedVmSpace);
-  // auto segment =
-  //    process1->createSegment(virtualAddress, 5, AccessType::READ_WRITE);
-  // cout << "segment: " << segment << endl;
-
-  // for (int i = 0; i < 10; i++) {
-  //  auto currentAddress = virtualAddress + i * 10;
-  //  auto physicalAddress = process1->getPhysicalAddress(currentAddress);
-  //  cout << "currentAddress: " << currentAddress << endl;
-  //  cout << "physicalAddress: " << reinterpret_cast<uint64_t>(physicalAddress)
-  //       << endl;
-  //}
-
   System system(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
                 partition);
   SystemTest systemTest(system, alignedVmSpace, VM_SPACE_SIZE);
@@ -101,6 +69,22 @@ int main(void) {
   delete[] pmtSpace;
 
   std::cout << "Test finished\n";
+
+  cout << "Test creating overlapping segments and deleting segments" << endl;
+  auto p = system.createProcess();
+  auto createSegmentReturnCode =
+      p->createSegment(0, 10, AccessType::READ_WRITE);
+  assert(createSegmentReturnCode == Status::OK);
+  createSegmentReturnCode = p->createSegment(1024, 10, AccessType::READ_WRITE);
+  assert(createSegmentReturnCode == Status::TRAP);
+  auto deleteSegmentReturnCode = p->deleteSegment(1024 * 10);
+  assert(deleteSegmentReturnCode == Status::TRAP);
+  deleteSegmentReturnCode = p->deleteSegment(1024);
+  assert(deleteSegmentReturnCode == Status::OK);
+  createSegmentReturnCode = p->createSegment(1024, 1, AccessType::READ_WRITE);
+  assert(createSegmentReturnCode == Status::OK);
+
+  cout << "Test finished" << endl;
 
   int debug;
   cin >> debug;
