@@ -20,6 +20,24 @@ Status KernelProcess::createSegment(VirtualAddress startAddress,
               << " is not aligned to PAGE_SIZE: " << PAGE_SIZE << std::endl;
     return Status::TRAP;
   }
+
+  bool overlapFound = false;
+  for (int i = 0; i < segmentSize && !overlapFound; i++) {
+    VirtualAddress currentAddress = startAddress + i * PAGE_SIZE;
+    auto it = virtualAddressToPhysicalAddress.find(currentAddress);
+    if (it != virtualAddressToPhysicalAddress.end()) {
+      overlapFound = true;
+    }
+  }
+
+  if (overlapFound) {
+    std::cout
+        << "KernelProcess::createSegment() overlapFound for startAddress: "
+        << startAddress << " segmentSize: " << segmentSize
+        << " refusing to createSegment" << std::endl;
+    return Status::TRAP;
+  }
+
   auto kernelSystem = KernelSystem::getInstance();
   auto freeSegments = &kernelSystem->freeSegments;
   std::cout << "freeSegments: " << freeSegments->size() << std::endl;
@@ -48,6 +66,7 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
               << std::endl;
     return Status::TRAP;
   }
+
   // Afterwards load the segment with content
   for (int i = 0; i < segmentSize; i++) {
     auto offset = i * PAGE_SIZE;
@@ -57,6 +76,7 @@ Status KernelProcess::loadSegment(VirtualAddress startAddress,
     auto physicalAddress = virtualAddressToPhysicalAddress[currentAddress];
     memcpy(physicalAddress, currentContent, PAGE_SIZE);
   }
+
   return Status::OK;
 }
 
