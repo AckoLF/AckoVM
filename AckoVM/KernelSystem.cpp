@@ -15,6 +15,10 @@ KernelSystem::KernelSystem(PhysicalAddress processVMSpace,
     this->freeSegments.emplace_back(
         reinterpret_cast<PhysicalAddress>(currentAddress));
   }
+  this->partition = partition;
+  for (int i = 0; i < partition->getNumOfClusters(); i++) {
+    freeClusters.emplace_back(i);
+  }
 }
 
 KernelSystem::~KernelSystem() {
@@ -41,7 +45,15 @@ Status KernelSystem::access(ProcessId pid, VirtualAddress address,
               << std::endl;
     return Status::TRAP;
   }
+
   auto process = it->second;
+  if (process->isAddressInColdStorage(address)) {
+    std::cout << "KernelSystem::access() virtualAddress: " << address
+              << " for pid: " << pid
+              << " is in coldStorage, generating PAGE_FAULT" << std::endl;
+    return Status::PAGE_FAULT;
+  }
+
   auto physicalAddress = process->getPhysicalAddress(address);
   if (physicalAddress == 0) {
     std::cout << "KernelSystem::access() virtualAddress: " << address
@@ -52,7 +64,7 @@ Status KernelSystem::access(ProcessId pid, VirtualAddress address,
   auto segmentAccessPermissions =
       process->getSegmentAccessPermissions(alignedAddress);
   if (segmentAccessPermissions == AccessType::READ_WRITE) {
-    if (type != AccessType::READ && type != AccessType::WRITE) {
+    if (type == AccessType::EXECUTE) {
       return Status::TRAP;
     }
     return Status::OK;
@@ -80,7 +92,31 @@ KernelSystem* KernelSystem::getInstance(PhysicalAddress processVMSpace,
   return instance;
 }
 
-PhysicalAddress KernelSystem::getFreeSegment() {
+PhysicalAddress KernelSystem::getFreeSegment(ProcessId pid) {
+  if (freeSegments.empty()) {
+    // Need to put something in coldStorage
+    std::cout
+        << "KernelSystem::getFreeSegment() need to put something in coldStorage"
+        << std::endl;
+
+    auto clusterNo = freeClusters.front();
+    freeClusters.pop_front();
+
+    auto process = activeProcesses[pid];
+    auto pmt = process->getPmt();
+    auto coldStorage = process->getColdStorage();
+
+    auto it = pmt->begin();
+    auto virtualAddress = it->first;
+    auto physicalAddress = it->second;
+    auto buffer = reinterpret_cast<const char*>(physicalAddress);
+    partition->writeCluster(clusterNo, buffer);
+    pmt->erase(it);
+
+    (*coldStorage)[virtualAddress] = clusterNo;
+
+    return physicalAddress;
+  }
   auto freeSegment = freeSegments.front();
   freeSegments.pop_front();
   return freeSegment;
@@ -88,4 +124,10 @@ PhysicalAddress KernelSystem::getFreeSegment() {
 
 void KernelSystem::releaseSegment(PhysicalAddress segment) {
   freeSegments.emplace_back(segment);
+}
+
+Partition* KernelSystem::getPartition() { return this->partition; }
+
+std::list<PhysicalAddress>* KernelSystem::getFreeSegments() {
+  return &freeSegments;
 }

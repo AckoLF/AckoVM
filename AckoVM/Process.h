@@ -15,14 +15,17 @@ class Process {
   Status createSegment(VirtualAddress startAddress, PageNum segmentSize,
                        AccessType flags);
   Status loadSegment(VirtualAddress startAddress, PageNum segmentSize,
-                     AccessType flags, void *content);
+                     AccessType flags, void* content);
   Status deleteSegment(VirtualAddress startAddress);
   Status pageFault(VirtualAddress address);
   PhysicalAddress getPhysicalAddress(VirtualAddress address);
   AccessType getSegmentAccessPermissions(VirtualAddress address);
+  bool isAddressInColdStorage(VirtualAddress address);
+  std::unordered_map<VirtualAddress, PhysicalAddress>* getPmt();
+  std::unordered_map<VirtualAddress, ClusterNo>* getColdStorage();
 
  private:
-  KernelProcess *pProcess;
+  KernelProcess* pProcess;
   friend class System;
   friend class KernelSystem;
 };

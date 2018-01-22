@@ -12,7 +12,7 @@ Status Process::createSegment(VirtualAddress startAddress, PageNum segmentSize,
 }
 
 Status Process::loadSegment(VirtualAddress startAddress, PageNum segmentSize,
-                            AccessType flags, void *content) {
+                            AccessType flags, void* content) {
   return this->pProcess->loadSegment(startAddress, segmentSize, flags, content);
 }
 
@@ -30,4 +30,16 @@ PhysicalAddress Process::getPhysicalAddress(VirtualAddress address) {
 
 AccessType Process::getSegmentAccessPermissions(VirtualAddress address) {
   return pProcess->getSegmentAccessPermissions(address);
+}
+
+bool Process::isAddressInColdStorage(VirtualAddress address) {
+  return pProcess->isAddressInColdStorage(address);
+}
+
+std::unordered_map<VirtualAddress, PhysicalAddress>* Process::getPmt() {
+  return pProcess->getPmt();
+}
+
+std::unordered_map<VirtualAddress, ClusterNo>* Process::getColdStorage() {
+  return pProcess->getColdStorage();
 }
