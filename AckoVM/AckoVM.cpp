@@ -44,6 +44,16 @@ int main(void) {
 
   System system(alignedVmSpace, VM_SPACE_SIZE, alignedPmtSpace, PMT_SPACE_SIZE,
                 partition);
+
+  auto firstProcess = system.createProcess();
+  auto secondProcess = system.createProcess();
+  auto createSegmentReturnCode =
+      firstProcess->createSegment(0, VM_SPACE_SIZE, AccessType::READ_WRITE);
+  assert(createSegmentReturnCode == Status::OK);
+  createSegmentReturnCode =
+      secondProcess->createSegment(0, VM_SPACE_SIZE, AccessType::READ_WRITE);
+  assert(createSegmentReturnCode == Status::OK);
+
   /*SystemTest systemTest(system, alignedVmSpace, VM_SPACE_SIZE);
   ProcessTest* process[N_PROCESS];
   std::thread* threads[N_PROCESS];
@@ -86,7 +96,7 @@ int main(void) {
 
   cout << "Test finished" << endl;*/
 
-  auto process = system.createProcess();
+  /*auto process = system.createProcess();
   auto pid = process->getProcessId();
   auto startAddress = 0;
   for (int i = 0; i < 2 * VM_SPACE_SIZE; i++) {
@@ -129,6 +139,7 @@ int main(void) {
       assert(false);
     }
   }
+  */
 
   /*
   auto access = system.access(process->getProcessId(), 0 + index * PAGE_SIZE,

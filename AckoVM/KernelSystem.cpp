@@ -99,24 +99,44 @@ PhysicalAddress KernelSystem::getFreeSegment(ProcessId pid) {
         << "KernelSystem::getFreeSegment() need to put something in coldStorage"
         << std::endl;
 
+    if (freeClusters.empty()) {
+      std::cout << "No space left in coldStorage :(" << std::endl;
+      assert(false);
+    }
+
     auto clusterNo = freeClusters.front();
     freeClusters.pop_front();
 
-    auto process = activeProcesses[pid];
-    auto pmt = process->getPmt();
-    auto coldStorage = process->getColdStorage();
+    for (auto processIterator : activeProcesses) {
+      auto process = processIterator.second;
+      auto pmt = process->getPmt();
+      auto coldStorage = process->getColdStorage();
 
-    auto it = pmt->begin();
-    auto virtualAddress = it->first;
-    auto physicalAddress = it->second;
-    auto buffer = reinterpret_cast<const char*>(physicalAddress);
-    partition->writeCluster(clusterNo, buffer);
-    pmt->erase(it);
+      if (pmt->empty()) {
+        continue;
+      }
 
-    (*coldStorage)[virtualAddress] = clusterNo;
+      auto currentPid = process->getProcessId();
+      auto it = pmt->begin();
+      auto virtualAddress = it->first;
+      auto physicalAddress = it->second;
+      auto buffer = reinterpret_cast<const char*>(physicalAddress);
+      partition->writeCluster(clusterNo, buffer);
+      pmt->erase(it);
 
-    return physicalAddress;
+      std::cout << "Need to put virtualAddress: " << virtualAddress
+                << " in coldStorage for currentPid: " << currentPid
+                << " because pid: " << pid << " needs space." << std::endl;
+
+      (*coldStorage)[virtualAddress] = clusterNo;
+      return physicalAddress;
+    }
+
+    assert(false,
+           "this should never happen, we should always be able to move "
+           "something in coldStorage");
   }
+
   auto freeSegment = freeSegments.front();
   freeSegments.pop_front();
   return freeSegment;
