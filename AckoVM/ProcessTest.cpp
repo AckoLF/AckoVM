@@ -5,8 +5,7 @@
 #include "System.h"
 #include "SystemTest.h"
 
-// TODO (acko): Revert this back to 15
-#define POWER_OF_NUMBER_OF_INSTRUCTIONS (2)
+#define POWER_OF_NUMBER_OF_INSTRUCTIONS (15)
 
 ProcessTest::ProcessTest(System &system, SystemTest &systemTest_)
     : systemTest(systemTest_), finished(false) {

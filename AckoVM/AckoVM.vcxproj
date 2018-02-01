@@ -117,6 +117,7 @@
     <ClCompile Include="AckoVM.cpp" />
     <ClCompile Include="KernelProcess.cpp" />
     <ClCompile Include="KernelSystem.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcessTest.cpp" />
     <ClCompile Include="RandomNumberGenerator.cpp" />
